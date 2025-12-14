@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         beStrictAboutTestsThatDoNotTestAnything="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
-         convertDeprecationsToExceptions="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
+         failOnWarning="false"
+         failOnRisky="false"
+         beStrictAboutOutputDuringTests="true"
+         cacheDirectory=".phpunit.cache"
 >
   <testsuites>
     <testsuite name="Sanctum Test Suite">
-      <directory suffix=".php">./tests/</directory>
+      <directory suffix="Test.php">./tests/</directory>
+      <exclude>./tests/database/</exclude>
     </testsuite>
   </testsuites>
   <php>

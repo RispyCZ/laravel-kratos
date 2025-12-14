@@ -69,4 +69,9 @@ class KratosUser extends Model implements Authenticatable
             ->where('identity_verifiable_addresses.verified', true)
             ->exists();
     }
+
+    public function getAuthPasswordName()
+    {
+        throw new BadMethodCallException('Unexpected method ['.__FUNCTION__.'] call');
+    }
 }
