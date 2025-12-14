@@ -7,22 +7,19 @@ namespace Tests\Models;
 use DateTime;
 use Tests\TestCase;
 use Ory\Kratos\Client\Model\Identity;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Chivincent\LaravelKratos\Models\KratosIdentity;
 use Ory\Kratos\Client\Model\VerifiableIdentityAddress;
 
 class KratosIdentityTest extends TestCase
 {
-    /**
-     * @dataProvider identityProvider
-     */
+    #[DataProvider('identityProvider')]
     public function test_constructable(KratosIdentity $identity)
     {
         $this->assertInstanceOf(KratosIdentity::class, $identity);
     }
 
-    /**
-     * @dataProvider kratosIdentityProvider
-     */
+    #[DataProvider('kratosIdentityProvider')]
     public function test_from_kratos_identity(Identity $kratosIdentity)
     {
         $identity = KratosIdentity::fromKratosIdentity($kratosIdentity);
@@ -58,9 +55,7 @@ class KratosIdentityTest extends TestCase
         $this->assertNull($identity->updatedAt);
     }
 
-    /**
-     * @dataProvider identityProvider
-     */
+    #[DataProvider('identityProvider')]
     public function test_serializable(KratosIdentity $identity)
     {
         $this->assertIsArray($identity->toArray());
@@ -70,25 +65,19 @@ class KratosIdentityTest extends TestCase
         $this->assertJsonStringEqualsJsonString($identity->toJson(), json_encode($identity));
     }
 
-    /**
-     * @dataProvider identityProvider
-     */
+    #[DataProvider('identityProvider')]
     public function test_has_verified_email_as_verifiable_addresses_not_set(KratosIdentity $identity)
     {
         $this->assertFalse($identity->hasVerifiedEmail());
     }
 
-    /**
-     * @dataProvider unverifiedIdentityProvider
-     */
+    #[DataProvider('unverifiedIdentityProvider')]
     public function test_has_verified_email_as_unverified(KratosIdentity $identity)
     {
         $this->assertFalse($identity->hasVerifiedEmail());
     }
 
-    /**
-     * @dataProvider verifiedIdentityProvider
-     */
+    #[DataProvider('verifiedIdentityProvider')]
     public function test_has_verified_email_as_verified(KratosIdentity $identity)
     {
         $this->assertTrue($identity->hasVerifiedEmail());

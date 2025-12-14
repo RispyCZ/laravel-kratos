@@ -120,4 +120,9 @@ class KratosIdentity implements KratosIdentityContract, Authenticatable, Arrayab
     {
         return json_encode($this->jsonSerialize(), $options);
     }
+
+    public function getAuthPasswordName()
+    {
+        throw new BadMethodCallException('Unexpected method ['.__FUNCTION__.'] call');
+    }
 }
