@@ -26,7 +26,17 @@ class GuardTest extends TestCase
         $this->assertInstanceOf(Guard::class, app(Guard::class));
     }
 
-    public function test_authentication_with_kratos_session()
+    public function test_authentication_failed_without_kratos_session()
+    {
+        $user = app(Guard::class)(
+            Request::create('/'),
+            Mockery::mock(UserProvider::class)
+        );
+
+        $this->assertNull($user);
+    }
+
+    public function test_authentication_with_kratos_session_cookie()
     {
         $identity = Mockery::mock(Identity::class);
 
@@ -51,17 +61,7 @@ class GuardTest extends TestCase
         $this->assertInstanceOf(Authenticatable::class, $user);
     }
 
-    public function test_authentication_failed_without_kratos_session()
-    {
-        $user = app(Guard::class)(
-            Request::create('/'),
-            Mockery::mock(UserProvider::class)
-        );
-
-        $this->assertNull($user);
-    }
-
-    public function test_authentication_failed_with_invalid_kratos_session()
+    public function test_authentication_failed_with_invalid_kratos_session_cookie()
     {
         $this->mock(FrontendApi::class)
             ->shouldReceive('toSession')
@@ -70,6 +70,46 @@ class GuardTest extends TestCase
 
         $user = app(Guard::class)(
             Request::create('/', cookies: ['ory_kratos_session' => 'foobar']),
+            Mockery::mock(UserProvider::class)
+        );
+
+        $this->assertNull($user);
+    }
+
+    public function test_authentication_with_kratos_session_token()
+    {
+        $identity = Mockery::mock(Identity::class);
+
+        $session = Mockery::mock(Session::class);
+        $session->shouldReceive('getIdentity')->andReturn($identity);
+
+        $this->mock(FrontendApi::class)
+            ->shouldReceive('toSession')
+            ->with('token123')
+            ->andReturn($session);
+
+        $provider = Mockery::mock(UserProvider::class);
+        $provider->shouldReceive('retrieveById')
+            ->with($identity)
+            ->andReturn(Mockery::mock(Authenticatable::class));
+
+        $user = app(Guard::class)(
+            Request::create('/', server: ['HTTP_X_SESSION_TOKEN' => 'token123']),
+            $provider
+        );
+
+        $this->assertInstanceOf(Authenticatable::class, $user);
+    }
+
+    public function test_authentication_failed_with_invalid_kratos_session_token()
+    {
+        $this->mock(FrontendApi::class)
+            ->shouldReceive('toSession')
+            ->with('token123')
+            ->andReturn('invalid_session');
+
+        $user = app(Guard::class)(
+            Request::create('/', server: ['HTTP_X_SESSION_TOKEN' => 'token123']),
             Mockery::mock(UserProvider::class)
         );
 
