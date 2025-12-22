@@ -17,9 +17,7 @@ class Guard
 
     protected const KRATOS_SESSION_HEADER = 'X-Session-Token';
 
-    public function __construct(protected FrontendApi $api)
-    {
-    }
+    public function __construct(protected FrontendApi $api) {}
 
     public function __invoke(Request $request, UserProvider $provider): ?Authenticatable
     {
@@ -31,6 +29,16 @@ class Guard
         return $provider->retrieveById($identity);
     }
 
+    public function logout(?string $cookie, ?string $session_token): void
+    {
+        $session = $this->getKratosSession($cookie, $session_token);
+        if (! $session) {
+            return;
+        }
+
+        dd($session);
+    }
+
     protected function getKratosSession(?string $cookie, ?string $session_token): ?Session
     {
         if (! $cookie && ! $session_token) {
@@ -39,7 +47,7 @@ class Guard
 
         if ($cookie) {
             try {
-                $session = $this->api->toSession(cookie: static::KRATOS_SESSION_COOKIE."=$cookie");
+                $session = $this->api->toSession(cookie: static::KRATOS_SESSION_COOKIE . "=$cookie");
             } catch (ApiException) {
                 return null;
             }
